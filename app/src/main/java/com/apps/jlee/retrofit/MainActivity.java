@@ -2,6 +2,7 @@ package com.apps.jlee.retrofit;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
@@ -27,10 +28,6 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        recyclerView = findViewById(R.id.repo_name_RV);
-        gitHubRepoAdapter = new GitHubRepoAdapter(MainActivity.this, repos);
-        recyclerView.setAdapter(gitHubRepoAdapter);
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger()
         {
@@ -68,7 +65,10 @@ public class MainActivity extends Activity
             public void onResponse(Call<List<GitHubRepo>> call, Response<List<GitHubRepo>> response)
             {
                 repos = response.body();
-                gitHubRepoAdapter.notifyDataSetChanged();
+                recyclerView = findViewById(R.id.repo_name_RV);
+                recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                gitHubRepoAdapter = new GitHubRepoAdapter(MainActivity.this, repos);
+                recyclerView.setAdapter(gitHubRepoAdapter);
             }
 
             @Override
