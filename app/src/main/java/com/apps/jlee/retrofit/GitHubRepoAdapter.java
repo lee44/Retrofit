@@ -1,45 +1,67 @@
 package com.apps.jlee.retrofit;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.List;
 
-public class GitHubRepoAdapter extends ArrayAdapter<GitHubRepo>
+public class GitHubRepoAdapter extends RecyclerView.Adapter<GitHubRepoAdapter.ViewHolder>
 {
+    private List<GitHubRepo> list;
 
-    private Context context;
-    private List<GitHubRepo> values;
-
-    public GitHubRepoAdapter(Context context, List<GitHubRepo> values)
+    public GitHubRepoAdapter(Context c, List<GitHubRepo> list)
     {
-        super(context, R.layout.listview_item_layout, values);
-
-        this.context = context;
-        this.values = values;
+        this.list = list;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public GitHubRepoAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
-        View row = convertView;
+        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+        View view = inflater.inflate(R.layout.repo_listview_item_, viewGroup, false);
 
-        if (row == null)
-        {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(R.layout.listview_item_layout, parent, false);
-        }
+        ViewHolder viewHolder = new ViewHolder(view);
+        return viewHolder;
+    }
 
-        TextView textView = (TextView) row.findViewById(R.id.listview_item_tv);
-
-        GitHubRepo item = values.get(position);
+    @Override
+    public void onBindViewHolder(@NonNull GitHubRepoAdapter.ViewHolder viewHolder, int i)
+    {
+        GitHubRepo item = list.get(i);
         String message = item.getName();
-        textView.setText(message);
+        viewHolder.repo_name.setText(message);
+    }
 
-        return row;
+    @Override
+    public int getItemCount()
+    {
+        return list.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder
+    {
+        TextView repo_name;
+
+        public ViewHolder(View itemView)
+        {
+            super(itemView);
+
+            repo_name = itemView.findViewById(R.id.repo_name_tv);
+
+            itemView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+
+                }
+            });
+        }
     }
 }

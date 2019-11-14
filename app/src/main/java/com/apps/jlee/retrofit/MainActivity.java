@@ -2,12 +2,14 @@ package com.apps.jlee.retrofit;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -16,7 +18,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends Activity
 {
-    private ListView listView;
+    private RecyclerView recyclerView;
+    private GitHubRepoAdapter gitHubRepoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -24,13 +27,25 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listView = (ListView) findViewById(R.id.repo_name_lv);
+        recyclerView = findViewById(R.id.repo_name_RV);
+
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger()
+        {
+            @Override
+            public void log(String s)
+            {
+                Log.v("Http", s);
+            }
+        });
+        interceptor.level(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         /**
          * Define the retrofit object
          */
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl("https://api.github.com/")
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create());
         /**
          * Build the retrofit object
@@ -50,8 +65,9 @@ public class MainActivity extends Activity
             public void onResponse(Call<List<GitHubRepo>> call, Response<List<GitHubRepo>> response)
             {
                 List<GitHubRepo> repos = response.body();
-                Log.v("Dodgers",response.body().toString());
-                listView.setAdapter(new GitHubRepoAdapter(MainActivity.this, repos));
+                gitHubRepoAdapter = new GitHubRepoAdapter(MainActivity.this, repos);
+                recyclerView.setAdapter(gitHubRepoAdapter);
+                gitHubRepoAdapter.notifyDataSetChanged();
             }
 
             @Override
